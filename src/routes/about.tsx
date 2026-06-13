@@ -170,11 +170,6 @@ function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* hidden hero portrait reference so eslint won't trim it -- not actually needed */}
-      <div className="hidden" aria-hidden="true">
-        <img src={serviceClinical} alt="" />
-      </div>
     </>
   );
 }
