@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import facility from "@/assets/facility-interior.jpg";
-import serviceClinical from "@/assets/service-clinical.jpg";
+
 
 export const Route = createFileRoute("/about")({
   head: () => ({
