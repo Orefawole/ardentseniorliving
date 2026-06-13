@@ -11,22 +11,46 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
+
+const ORG_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  name: "Ardent Senior Living Ltd",
+  description:
+    "Premium elderly wellness and adult day care in Ikoyi, Lagos. Dignified day care, clinical monitoring, and engagement for Nigerian seniors and diaspora families.",
+  telephone: "+2348114018598",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "12 Glover Road",
+    addressLocality: "Ikoyi",
+    addressRegion: "Lagos",
+    addressCountry: "NG",
+  },
+  areaServed: "Lagos, Nigeria",
+  openingHours: "Mo-Sa 08:00-18:00",
+  priceRange: "Premium",
+};
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-brand-gold font-semibold mb-3">
+          Page Not Found
+        </p>
+        <h1 className="font-serif text-6xl text-brand-navy">404</h1>
+        <p className="mt-4 text-sm text-stone-600">
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <div className="mt-6">
+        <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-block bg-brand-navy text-white px-6 py-3 text-xs font-semibold uppercase tracking-widest hover:bg-brand-gold transition-colors"
           >
-            Go home
+            Return Home
           </Link>
         </div>
       </div>
@@ -42,27 +66,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <h1 className="font-serif text-3xl text-brand-navy">This page didn't load</h1>
+        <p className="mt-3 text-sm text-stone-600">
+          Something went wrong on our end. Please try again or return home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="bg-brand-navy text-white px-6 py-3 text-xs font-semibold uppercase tracking-widest hover:bg-brand-gold transition-colors"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="border border-brand-navy/20 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-brand-navy hover:bg-brand-stone transition-colors"
           >
             Go home
           </a>
@@ -77,19 +99,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Ardent Senior Living — Premium Elder Day Care in Ikoyi, Lagos" },
+      {
+        name: "description",
+        content:
+          "Premium adult day care and wellness for seniors in Ikoyi, Lagos. Dignified care, clinical oversight, and family communication built for Nigerian families at home and abroad.",
+      },
+      { name: "author", content: "Ardent Senior Living Ltd" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:site_name", content: "Ardent Senior Living" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#0F172A" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(ORG_JSONLD),
       },
     ],
   }),
@@ -118,8 +152,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen flex-col bg-white">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+        <WhatsAppFloat />
+      </div>
     </QueryClientProvider>
   );
 }
