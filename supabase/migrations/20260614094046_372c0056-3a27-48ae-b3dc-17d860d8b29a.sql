@@ -1,0 +1,1 @@
+CREATE POLICY "Deny all SELECT on inquiries" ON public.inquiries FOR SELECT TO anon, authenticated USING (false);
