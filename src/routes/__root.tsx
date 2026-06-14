@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ardent Senior Living — Premium Elder Day Care in Ikoyi, Lagos" },
+      { title: "Ardent Senior Living — Premium Adult Day Care in Lagos" },
       {
         name: "description",
         content:
@@ -110,6 +110,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Ardent Senior Living" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0F172A" },
+      { property: "og:title", content: "Ardent Senior Living — Premium Adult Day Care in Lagos" },
+      { name: "twitter:title", content: "Ardent Senior Living — Premium Adult Day Care in Lagos" },
+      { name: "description", content: "Ardent Senior Living is a premium Adult day care and wellness center in Ikoyi, Lagos." },
+      { property: "og:description", content: "Ardent Senior Living is a premium Adult day care and wellness center in Ikoyi, Lagos." },
+      { name: "twitter:description", content: "Ardent Senior Living is a premium Adult day care and wellness center in Ikoyi, Lagos." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3e9RzZlbYoP0CoXGK5ayxg0pCoA3/social-images/social-1781429997378-Ardent_Logo.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/3e9RzZlbYoP0CoXGK5ayxg0pCoA3/social-images/social-1781429997378-Ardent_Logo.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
