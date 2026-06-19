@@ -154,10 +154,9 @@ function AboutPage() {
           <h2 className="font-serif text-3xl md:text-4xl text-brand-navy mb-10 max-w-2xl mx-auto">
             Held to the standards families expect — and a few they don't.
           </h2>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 text-stone-500">
+          <div className="flex flex-col items-center gap-4 text-stone-500">
             <span className="font-serif italic text-lg">Lagos State Health Council</span>
             <span className="font-serif italic text-lg">Nigerian Medical Association</span>
-            <br />
             <span className="font-serif italic text-lg">Geriatric Care Standards 2026</span>
           </div>
           <div className="mt-12 flex justify-center">
