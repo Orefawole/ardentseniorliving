@@ -158,7 +158,7 @@ function AboutPage() {
             <span className="font-serif italic text-lg">Lagos State Health Council</span>
             <span className="font-serif italic text-lg">Nigerian Medical Association</span>
             <br />
-            <span className="font-serif italic text-lg">Geriatric Care Standards 2024</span>
+            <span className="font-serif italic text-lg">Geriatric Care Standards 2026</span>
           </div>
           <div className="mt-12 flex justify-center">
             <Link
