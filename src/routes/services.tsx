@@ -84,7 +84,7 @@ const services = [
   {
     title: "Nutrition & Meal Planning",
     image: serviceNutrition,
-    alt: "Plated healthy Nigerian meal on a linen table",
+    alt: "Healthy Nigerian meal of steamed rice, vegetable stew, grilled fish, and soft plantain on a linen table",
     desc: "Menus designed by a clinical nutritionist around each resident's medical and cultural needs.",
     items: [
       "Diabetic, low-sodium, and renal options",
