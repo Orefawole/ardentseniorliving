@@ -24,7 +24,7 @@ const ORG_JSONLD = {
   telephone: "+2348114018598",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "12 Glover Road",
+    streetAddress: "",
     addressLocality: "Ikoyi",
     addressRegion: "Lagos",
     addressCountry: "NG",

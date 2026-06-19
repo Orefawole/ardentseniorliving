@@ -53,7 +53,7 @@ function ContactPage() {
             <ContactItem
               icon={<MapPin size={18} />}
               label="Visit"
-              lines={["12 Glover Road", "Ikoyi, Lagos, Nigeria"]}
+              lines={["Ikoyi, Lagos", "Nigeria"]}
             />
             <ContactItem
               icon={<Clock size={18} />}

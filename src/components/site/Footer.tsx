@@ -21,8 +21,6 @@ export function Footer() {
             Visit
           </p>
           <address className="not-italic text-sm text-stone-600 leading-relaxed">
-            12 Glover Road
-            <br />
             Ikoyi, Lagos
             <br />
             Nigeria
