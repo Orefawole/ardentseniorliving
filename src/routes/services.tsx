@@ -96,7 +96,7 @@ const services = [
   {
     title: "Family Communication",
     image: serviceCommunication,
-    alt: "Elderly woman on a video call with her family",
+    alt: "Elderly woman on a video call with her daughter and son on a tablet",
     desc: "Built for diaspora families — you stay close, even from London or Houston.",
     items: [
       "Weekly written wellness summary",
