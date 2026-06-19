@@ -157,7 +157,7 @@ function AboutPage() {
           <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 text-stone-500">
             <span className="font-serif italic text-lg">Lagos State Health Council</span>
             <span className="font-serif italic text-lg">Nigerian Medical Association</span>
-            <span className="font-serif italic text-lg">Global Aging Network Member</span>
+            <br />
             <span className="font-serif italic text-lg">Geriatric Care Standards 2024</span>
           </div>
           <div className="mt-12 flex justify-center">
