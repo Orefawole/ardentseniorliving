@@ -8,7 +8,7 @@ export function Footer() {
         <div className="md:col-span-1">
           <p className="font-serif text-xl font-bold text-brand-navy">Ardent Senior Living Ltd</p>
           <p className="text-[10px] tracking-[0.3em] uppercase text-brand-gold mt-1">
-            Lagos · Since 2012
+            LAGOS ·
           </p>
           <p className="text-xs text-stone-500 mt-6 max-w-xs leading-relaxed">
             Premium elderly wellness and adult day care in the heart of Ikoyi — built for Nigerian
