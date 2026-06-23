@@ -88,8 +88,8 @@ function ContactPage() {
               icon={<Mail size={18} />}
               label="Email"
               lines={[
-                <a key="e" href="mailto:care@ardentliving.com" className="hover:text-brand-gold">
-                  care@ardentliving.com
+                <a key="e" href="mailto:Admin@ardentlivinglagos.com" className="hover:text-brand-gold">
+                  Admin@ardentlivinglagos.com
                 </a>,
               ]}
             />

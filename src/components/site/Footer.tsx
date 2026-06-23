@@ -49,8 +49,8 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <a href="mailto:care@ardentliving.com" className="hover:text-brand-gold">
-                care@ardentliving.com
+              <a href="mailto:Admin@ardentlivinglagos.com" className="hover:text-brand-gold">
+                Admin@ardentlivinglagos.com
               </a>
             </li>
           </ul>
