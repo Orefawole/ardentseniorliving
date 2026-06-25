@@ -20,7 +20,8 @@ export function InquiryForm({ variant = "light" }: { variant?: Variant }) {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (status === "loading") return;
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     setStatus("loading");
     setError(null);
     try {
@@ -34,7 +35,7 @@ export function InquiryForm({ variant = "light" }: { variant?: Variant }) {
         },
       });
       setStatus("success");
-      e.currentTarget.reset();
+      form.reset();
     } catch (err) {
       setStatus("error");
       setError(
