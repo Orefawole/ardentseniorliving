@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
 
 const inquirySchema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(200),
