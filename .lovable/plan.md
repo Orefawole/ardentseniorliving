@@ -1,40 +1,36 @@
-## Problem
+## Goal
 
-Resend rejected the notification email with 403 `validation_error`:
+Make the inquiry form work on the live site without depending on the database. Each submission goes directly to `info@ardentlivinglagos.com` (and a confirmation to the inquirer) through Resend. The "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY" error disappears because no Supabase client is created at all.
 
-> You can only send testing emails to your own email address (ardentlivinglagos@gmail.com). To send emails to other recipients, please verify a domain... and change the `from` address to an email using this domain.
+## Why the live error happens
 
-The current notification uses `from: "Ardent Inquiries <onboarding@resend.dev>"`. `onboarding@resend.dev` is Resend's shared sandbox sender — when the API key it's sent with hasn't verified that exact address, Resend treats the send as a test and only allows the account owner's email as recipient. That's why `info@ardentlivinglagos.com` is blocked.
+The current `submitInquiry` server function builds a Supabase client from `process.env.SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`. On the published Lovable deployment those server-side env vars aren't injected the way the dev sandbox provides them, so the client constructor throws the "Missing Supabase environment variable(s)" error before anything else runs — even though we're only inserting a row. Removing the Supabase call removes the failure mode entirely.
 
-Your `ardentlivinglagos.com` domain **is** verified on this Resend account (the confirmation email to the inquirer, sent from `hello@ardentlivinglagos.com`, works fine). So the fix is to send the notification from the verified domain too.
+## Changes
 
-The earlier reason I moved off the verified domain was a worry that Zoho would treat same-domain mail from Resend as spoofing and silently quarantine it. In practice, since your domain's SPF/DKIM are set up for Resend during verification, Zoho should accept it — the message is properly authenticated, not spoofed. If it does land in Spam on first delivery, marking it "Not Spam" once trains the filter.
+**1. `src/lib/inquiries.functions.ts`** — strip out Supabase, keep Resend.
+- Remove the `createClient` import, the `supabasePublic` creation, and the `.from("inquiries").insert(...)` block.
+- Keep validation, both Resend sends (notification + confirmation), HTML templates, and the `Promise.allSettled` error handling.
+- If `RESEND_API_KEY` is missing OR the notification send fails, throw a user-facing error so the form shows a real failure instead of a silent success. The confirmation email staying best-effort is fine.
+- Log a stable request ID per submission to make Resend dashboard lookups easier.
 
-## Fix
+**2. No frontend changes.** `InquiryForm.tsx` already calls `submitInquiry` and handles success/error states correctly.
 
-In `src/lib/inquiries.functions.ts`, change one constant:
+**3. Leave the `inquiries` table in place.** It's harmless, no longer written to, and removing it is a separate decision. (Mention to user; they can ask for a follow-up migration to drop it if they want.)
 
-```ts
-// before
-const FROM_NOTIFICATION = "Ardent Inquiries <onboarding@resend.dev>";
-// after
-const FROM_NOTIFICATION = "Ardent Inquiries <inquiries@ardentlivinglagos.com>";
-```
+## What stays the same
 
-Everything else stays the same:
-- Notification `to`: `info@ardentlivinglagos.com`
-- Notification `reply_to`: the inquirer's email (so replies from Zoho go straight to them)
-- Confirmation email: unchanged (`hello@ardentlivinglagos.com` → inquirer)
+- Sender: `Ardent Inquiries <admin@ardentlivinglagos.com>` → `info@ardentlivinglagos.com`, with `reply_to` set to the inquirer so Zoho replies go straight to them.
+- Confirmation: `info@ardentlivinglagos.com` → inquirer.
+- All copy, branding, and the WhatsApp / phone fallbacks in the templates.
 
-## After deploying
+## Verification after build mode
 
-1. Submit a test inquiry on `/contact` with a real email you can check.
-2. Confirm the notification arrives in your Zoho `info@` inbox (check Spam once — if it's there, mark Not Spam).
-3. Confirm the confirmation email arrives at the inquirer address.
+1. Submit a test inquiry on `/contact` with a real email.
+2. Confirm the notification lands in Zoho `info@` (check Spam once if first delivery).
+3. Confirm the confirmation arrives at the inquirer.
+4. Confirm the form no longer shows the Supabase env-var error.
 
-If Zoho still quarantines it after this, the next move is a dedicated subdomain sender like `notify@mail.ardentlivinglagos.com` (separate DKIM, no overlap with your Zoho MX) — but try the simple fix first.
+## Trade-off to flag
 
-## Notes for later
-
-- The Resend dashboard logs will now show notification sends under your domain, making delivery issues easier to diagnose.
-- Optional Zoho filter: flag subjects starting with `New inquiry ·` so notifications land in a dedicated folder.
+Without the DB row, submissions exist only as emails. If a Resend send ever fails silently or an email is deleted, there's no second copy. If you want a safety net later, the cleanest option is a tiny Resend-only audit log (e.g. append to a Google Sheet via a connector, or re-enable the DB insert once Cloud envs are sorted) — not required for this fix.
