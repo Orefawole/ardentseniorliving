@@ -18,7 +18,9 @@ const inquirySchema = z.object({
 export type InquiryInput = z.infer<typeof inquirySchema>;
 
 const INTERNAL_RECIPIENT = "info@ardentlivinglagos.com";
-const FROM_NOTIFICATION = "Ardent Inquiries <inquiries@ardentlivinglagos.com>";
+// Send notification from Resend's shared domain to avoid same-domain (Zoho)
+// treating the message as spoofing and quarantining it silently.
+const FROM_NOTIFICATION = "Ardent Inquiries <onboarding@resend.dev>";
 const FROM_CONFIRMATION = "Ardent Senior Living <hello@ardentlivinglagos.com>";
 
 function esc(s: string): string {
