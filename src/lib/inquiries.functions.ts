@@ -161,7 +161,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
 
     // Internal notification to Zoho inbox
     sends.push(
-      sendResend({
+      sendResend("notification", {
         from: FROM_NOTIFICATION,
         to: INTERNAL_RECIPIENT,
         subject: `New inquiry · ${data.inquiry_type || "General"} · ${data.name}`,
