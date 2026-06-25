@@ -3,3 +3,11 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
+
+{
+  "framework": null,
+  "outputDirectory": "dist/client",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
