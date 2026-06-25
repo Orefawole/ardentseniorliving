@@ -180,7 +180,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
     // Confirmation to inquirer (only if they provided an email)
     if (data.email) {
       sends.push(
-        sendResend({
+        sendResend("confirmation", {
           from: FROM_CONFIRMATION,
           to: data.email,
           subject: "We've received your inquiry — Ardent Senior Living",
