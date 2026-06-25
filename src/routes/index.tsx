@@ -156,9 +156,7 @@ function HomePage() {
           <p className="text-center text-[10px] uppercase tracking-[0.3em] text-stone-500 mb-8">
             Trusted by families in London · Houston · Lagos · Toronto
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <Stat n="12+" label="Years of Care" />
-            <Stat n="200+" label="Families Served" />
+          <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
             <Stat n="1:3" label="Staff Ratio" />
             <Stat n="24/7" label="Nursing Cover" />
           </div>
