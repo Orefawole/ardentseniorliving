@@ -75,7 +75,7 @@ const services = [
   {
     title: "Family Communication",
     blurb:
-      "Regular wellness reports and virtual visits keep diaspora families close to home.",
+      "Regular wellness reports and virtual visits keep Nigeria-based and diaspora families close to home.",
     image: serviceCommunication,
     alt: "Elderly Nigerian woman on a video call with her family",
   },
@@ -113,8 +113,8 @@ function HomePage() {
               Dignified Care for the <span className="italic">Golden Years.</span>
             </h1>
             <p className="text-lg text-stone-600 mb-8 max-w-lg leading-relaxed">
-              Ardent provides premium adult day care in the heart of Ikoyi, offering diaspora
-              families complete peace of mind through world-class wellness and warm social
+              Ardent provides premium adult day care in the heart of Ikoyi, offering Nigeria-based and
+              diaspora families complete peace of mind through world-class wellness and warm social
               engagement.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

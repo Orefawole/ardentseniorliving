@@ -20,7 +20,7 @@ const ORG_JSONLD = {
   "@type": "MedicalBusiness",
   name: "Ardent Senior Living Ltd",
   description:
-    "Premium elderly wellness and adult day care in Ikoyi, Lagos. Dignified day care, clinical monitoring, and engagement for Nigerian seniors and diaspora families.",
+    "Premium elderly wellness and adult day care in Ikoyi, Lagos. Dignified day care, clinical monitoring, and engagement for Nigerian seniors and families in Nigeria and the diaspora.",
   telephone: "+2348114018598",
   address: {
     "@type": "PostalAddress",

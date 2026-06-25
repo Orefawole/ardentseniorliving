@@ -75,9 +75,9 @@ const services = [
     alt: "Older women laughing together in a craft room",
     desc: "A curated daily programme that keeps minds sharp, bodies moving, and spirits warm.",
     items: [
-      "Storytelling circles and Yoruba/Igbo language sessions",
+      "Storytelling circles celebrating Nigerian history and culture",
       "Light yoga, chair fitness, and physiotherapy",
-      "Arts, music therapy, and faith-based programmes",
+      "Arts, music therapy, and values-based programmes",
       "Weekly outings within Ikoyi",
     ],
   },
@@ -97,7 +97,7 @@ const services = [
     title: "Family Communication",
     image: serviceCommunication,
     alt: "Elderly woman on a video call with her daughter and son on a tablet",
-    desc: "Built for diaspora families — you stay close, even from London or Houston.",
+    desc: "Built for Nigeria-based and diaspora families — you stay close, even from London or Houston.",
     items: [
       "Weekly written wellness summary",
       "On-demand WhatsApp updates",
