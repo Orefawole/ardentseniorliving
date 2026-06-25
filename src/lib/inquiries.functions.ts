@@ -189,4 +189,3 @@ export const submitInquiry = createServerFn({ method: "POST" })
     return { ok: true as const, requestId };
   });
 
-  });
