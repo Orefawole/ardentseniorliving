@@ -144,30 +144,8 @@ async function sendResend(
 export const submitInquiry = createServerFn({ method: "POST" })
   .validator((input: unknown) => inquirySchema.parse(input))
   .handler(async ({ data }) => {
-    const supabasePublic = createClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      {
-        auth: {
-          storage: undefined,
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-      },
-    );
-
-    const { error } = await supabasePublic.from("inquiries").insert({
-      name: data.name,
-      phone: data.phone,
-      email: data.email ?? null,
-      inquiry_type: data.inquiry_type ?? null,
-      message: data.message ?? null,
-      source: "website",
-    });
-    if (error) {
-      console.error("[submitInquiry]", error);
-      throw new Error("We couldn't submit your inquiry. Please try again or call us directly.");
-    }
+    const requestId = `inq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    console.log(`[submitInquiry:${requestId}] received from ${data.name}`);
 
     const submittedAt = new Date().toLocaleString("en-NG", {
       timeZone: "Africa/Lagos",
@@ -175,41 +153,40 @@ export const submitInquiry = createServerFn({ method: "POST" })
       timeStyle: "short",
     });
 
-    const sends: Promise<void>[] = [];
-
-    // Internal notification to Zoho inbox
-    sends.push(
-      sendResend("notification", {
-        from: FROM_NOTIFICATION,
-        to: INTERNAL_RECIPIENT,
-        subject: `New inquiry · ${data.inquiry_type || "General"} · ${data.name}`,
-        html: notificationHtml({
-          name: data.name,
-          phone: data.phone,
-          email: data.email,
-          inquiry_type: data.inquiry_type,
-          message: data.message,
-          submittedAt,
-        }),
-        ...(data.email ? { reply_to: data.email } : {}),
+    // Notification to Zoho inbox — must succeed, otherwise the inquiry is lost.
+    const notification = await sendResend(`${requestId}:notification`, {
+      from: FROM_NOTIFICATION,
+      to: INTERNAL_RECIPIENT,
+      subject: `New inquiry · ${data.inquiry_type || "General"} · ${data.name}`,
+      html: notificationHtml({
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        inquiry_type: data.inquiry_type,
+        message: data.message,
+        submittedAt,
       }),
-    );
+      ...(data.email ? { reply_to: data.email } : {}),
+    });
 
-    // Confirmation to inquirer (only if they provided an email)
-    if (data.email) {
-      sends.push(
-        sendResend("confirmation", {
-          from: FROM_CONFIRMATION,
-          to: data.email,
-          subject: "We've received your inquiry — Ardent Senior Living",
-          html: confirmationHtml(data.name),
-          reply_to: INTERNAL_RECIPIENT,
-        }),
+    if (!notification.ok) {
+      throw new Error(
+        "We couldn't submit your inquiry right now. Please WhatsApp or call us at +234 811 401 8598.",
       );
     }
 
-    // Don't fail the submission if emails fail; just log.
-    await Promise.allSettled(sends);
+    // Confirmation to inquirer is best-effort.
+    if (data.email) {
+      await sendResend(`${requestId}:confirmation`, {
+        from: FROM_CONFIRMATION,
+        to: data.email,
+        subject: "We've received your inquiry — Ardent Senior Living",
+        html: confirmationHtml(data.name),
+        reply_to: INTERNAL_RECIPIENT,
+      });
+    }
 
-    return { ok: true as const };
+    return { ok: true as const, requestId };
+  });
+
   });
