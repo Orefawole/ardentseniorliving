@@ -1,36 +1,38 @@
-## Problem
+## Goal
 
-The WhatsApp links currently point to `https://web.whatsapp.com/send?phone=2348114018598`. That URL is the WhatsApp **Web** desktop client, so on mobile it shows the "Use WhatsApp Web from a computer" dead-end page instead of opening the chat in the WhatsApp app.
+When someone submits the inquiry form on `/contact`:
+1. Save it to the database (already works).
+2. Email **info@ardentlivinglagos.com** (your Zoho inbox) with the inquiry details.
+3. Send the inquirer a branded confirmation email.
 
-We switched to `web.whatsapp.com` earlier to work around an `ERR_BLOCKED_BY_RESPONSE` from `api.whatsapp.com`. That redirect block was caused by the `+` sign we had in the `wa.me` path (`wa.me/+234…`). The correct format is `wa.me/2348114018598` (no `+`, no spaces) — this is WhatsApp's official click-to-chat URL and it:
+Both emails sent via Resend using your verified `ardentlivinglagos.com` domain.
 
-- on mobile → opens the WhatsApp app directly to the chat with that number
-- on desktop → opens WhatsApp Web / Desktop client to that chat
-- does not route through `api.whatsapp.com`, so it won't hit the earlier block
+## What I'll build
 
-## Change
+1. **Store the Resend API key** as `RESEND_API_KEY` (the value you shared). It lives only as a server secret, not in code.
 
-Replace every WhatsApp link across the site:
+2. **Update `src/lib/inquiries.functions.ts`**:
+   - After the DB insert succeeds, fire two Resend API calls in parallel (`Promise.allSettled`) via native `fetch` to `https://api.resend.com/emails`.
+   - Email failures are logged but do NOT fail the submission — the user still sees the success screen and the row is still saved.
+   - API key read inside the handler via `process.env.RESEND_API_KEY`.
 
-From:
-```
-https://web.whatsapp.com/send?phone=2348114018598
-```
+3. **Two inline HTML email templates** (brand-aligned: navy heading, gold accent rule, serif title, system body font; values HTML-escaped):
 
-To:
-```
-https://wa.me/2348114018598?text=Hello%20Ardent%2C%20I%27d%20like%20to%20learn%20more%20about%20your%20services.
-```
+   **Internal notification → `info@ardentlivinglagos.com`**
+   - From: `Ardent Inquiries <inquiries@ardentlivinglagos.com>`
+   - Reply-To: inquirer's email (so you can reply directly from Zoho); omitted if they didn't provide one
+   - Subject: `New inquiry · {Inquiry Type} · {Name}`
+   - Body: name, phone, email, inquiry type, message, submission timestamp (Africa/Lagos)
 
-(Prefilled message matches the existing one. The `text` param is optional — drop it if you'd rather not prefill.)
+   **Confirmation → inquirer's email** (only if they provided one)
+   - From: `Ardent Senior Living <hello@ardentlivinglagos.com>`
+   - Reply-To: `info@ardentlivinglagos.com`
+   - Subject: `We've received your inquiry — Ardent Senior Living`
+   - Body: warm thank-you, "we respond within one business day", WhatsApp + phone (+234 811 401 8598), signed "The Ardent Team"
 
-Files to update:
-- `src/components/site/WhatsAppFloat.tsx` (floating button)
-- `src/components/site/Footer.tsx` (footer "WhatsApp" link)
-- `src/routes/contact.tsx` (contact page WhatsApp CTA)
+4. **No changes** to the form UI, validation, success state, or Supabase table.
 
-Phone-number display text (`+234 811 401 8598`) and `tel:+2348114018598` links stay unchanged.
+## Notes for later
 
-## Verification
-
-After the change I'll grep the codebase to confirm no `web.whatsapp.com` or `wa.me/+234` strings remain, then ask you to tap the button on your phone — it should jump straight into the WhatsApp app with the Ardent chat open.
+- Optional Zoho filter: flag subjects starting with `New inquiry ·` for easy triage.
+- If you'd rather use different From local-parts (e.g. `noreply@`, `care@`), tell me and I'll swap them.
