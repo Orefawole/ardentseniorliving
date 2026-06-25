@@ -140,10 +140,21 @@ async function sendResend(
 }
 
 export const submitInquiry = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => inquirySchema.parse(input))
+  .validator((input: unknown) => inquirySchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("inquiries").insert({
+    const supabasePublic = createClient<Database>(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      {
+        auth: {
+          storage: undefined,
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      },
+    );
+
+    const { error } = await supabasePublic.from("inquiries").insert({
       name: data.name,
       phone: data.phone,
       email: data.email ?? null,
