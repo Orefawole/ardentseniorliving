@@ -85,7 +85,7 @@ const FAQS = [
   },
   {
     q: "How do you communicate with families abroad?",
-    a: "Diaspora families receive a weekly wellness summary, on-demand WhatsApp updates, and scheduled video visits with their loved one.",
+    a: "Nigeria-based and diaspora families receive a weekly wellness summary, on-demand WhatsApp updates, and scheduled video visits with their loved one.",
   },
   {
     q: "What is the staff-to-resident ratio?",
