@@ -1,38 +1,40 @@
-## Goal
+## Problem
 
-When someone submits the inquiry form on `/contact`:
-1. Save it to the database (already works).
-2. Email **info@ardentlivinglagos.com** (your Zoho inbox) with the inquiry details.
-3. Send the inquirer a branded confirmation email.
+Resend rejected the notification email with 403 `validation_error`:
 
-Both emails sent via Resend using your verified `ardentlivinglagos.com` domain.
+> You can only send testing emails to your own email address (ardentlivinglagos@gmail.com). To send emails to other recipients, please verify a domain... and change the `from` address to an email using this domain.
 
-## What I'll build
+The current notification uses `from: "Ardent Inquiries <onboarding@resend.dev>"`. `onboarding@resend.dev` is Resend's shared sandbox sender — when the API key it's sent with hasn't verified that exact address, Resend treats the send as a test and only allows the account owner's email as recipient. That's why `info@ardentlivinglagos.com` is blocked.
 
-1. **Store the Resend API key** as `RESEND_API_KEY` (the value you shared). It lives only as a server secret, not in code.
+Your `ardentlivinglagos.com` domain **is** verified on this Resend account (the confirmation email to the inquirer, sent from `hello@ardentlivinglagos.com`, works fine). So the fix is to send the notification from the verified domain too.
 
-2. **Update `src/lib/inquiries.functions.ts`**:
-   - After the DB insert succeeds, fire two Resend API calls in parallel (`Promise.allSettled`) via native `fetch` to `https://api.resend.com/emails`.
-   - Email failures are logged but do NOT fail the submission — the user still sees the success screen and the row is still saved.
-   - API key read inside the handler via `process.env.RESEND_API_KEY`.
+The earlier reason I moved off the verified domain was a worry that Zoho would treat same-domain mail from Resend as spoofing and silently quarantine it. In practice, since your domain's SPF/DKIM are set up for Resend during verification, Zoho should accept it — the message is properly authenticated, not spoofed. If it does land in Spam on first delivery, marking it "Not Spam" once trains the filter.
 
-3. **Two inline HTML email templates** (brand-aligned: navy heading, gold accent rule, serif title, system body font; values HTML-escaped):
+## Fix
 
-   **Internal notification → `info@ardentlivinglagos.com`**
-   - From: `Ardent Inquiries <inquiries@ardentlivinglagos.com>`
-   - Reply-To: inquirer's email (so you can reply directly from Zoho); omitted if they didn't provide one
-   - Subject: `New inquiry · {Inquiry Type} · {Name}`
-   - Body: name, phone, email, inquiry type, message, submission timestamp (Africa/Lagos)
+In `src/lib/inquiries.functions.ts`, change one constant:
 
-   **Confirmation → inquirer's email** (only if they provided one)
-   - From: `Ardent Senior Living <hello@ardentlivinglagos.com>`
-   - Reply-To: `info@ardentlivinglagos.com`
-   - Subject: `We've received your inquiry — Ardent Senior Living`
-   - Body: warm thank-you, "we respond within one business day", WhatsApp + phone (+234 811 401 8598), signed "The Ardent Team"
+```ts
+// before
+const FROM_NOTIFICATION = "Ardent Inquiries <onboarding@resend.dev>";
+// after
+const FROM_NOTIFICATION = "Ardent Inquiries <inquiries@ardentlivinglagos.com>";
+```
 
-4. **No changes** to the form UI, validation, success state, or Supabase table.
+Everything else stays the same:
+- Notification `to`: `info@ardentlivinglagos.com`
+- Notification `reply_to`: the inquirer's email (so replies from Zoho go straight to them)
+- Confirmation email: unchanged (`hello@ardentlivinglagos.com` → inquirer)
+
+## After deploying
+
+1. Submit a test inquiry on `/contact` with a real email you can check.
+2. Confirm the notification arrives in your Zoho `info@` inbox (check Spam once — if it's there, mark Not Spam).
+3. Confirm the confirmation email arrives at the inquirer address.
+
+If Zoho still quarantines it after this, the next move is a dedicated subdomain sender like `notify@mail.ardentlivinglagos.com` (separate DKIM, no overlap with your Zoho MX) — but try the simple fix first.
 
 ## Notes for later
 
-- Optional Zoho filter: flag subjects starting with `New inquiry ·` for easy triage.
-- If you'd rather use different From local-parts (e.g. `noreply@`, `care@`), tell me and I'll swap them.
+- The Resend dashboard logs will now show notification sends under your domain, making delivery issues easier to diagnose.
+- Optional Zoho filter: flag subjects starting with `New inquiry ·` so notifications land in a dedicated folder.
