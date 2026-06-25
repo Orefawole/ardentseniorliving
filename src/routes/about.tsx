@@ -95,10 +95,10 @@ function AboutPage() {
             <SectionHeader eyebrow="Our Story" title="Born from a daughter's question." />
             <p className="text-stone-600 leading-relaxed mb-4">
               Ardent began with a simple, painful question asked by a Lagos-born professional living
-              abroad: <em>"Who will look after my mother during the day?"</em>
+              abroad: <em>"Who will look after my father during the day?"</em>
             </p>
             <p className="text-stone-600 leading-relaxed mb-4">
-              In 2012, our founders opened a small Ikoyi residence with three registered nurses and
+              Then, our founder opened a small Ikoyi residence with three registered nurses and
               a promise: combine the standards of international geriatric medicine with the warmth
               of a Nigerian home.
             </p>
