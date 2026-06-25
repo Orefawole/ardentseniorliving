@@ -132,7 +132,7 @@ function AboutPage() {
               },
               {
                 t: "Cultural warmth",
-                b: "Food, music, stories, and faith that feel like home — not a foreign institution.",
+                b: "Food, music, stories, and shared values that feel like home — not a foreign institution.",
               },
             ].map((v) => (
               <div key={v.t}>
