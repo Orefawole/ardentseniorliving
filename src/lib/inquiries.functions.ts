@@ -18,10 +18,11 @@ const inquirySchema = z.object({
 export type InquiryInput = z.infer<typeof inquirySchema>;
 
 const INTERNAL_RECIPIENT = "info@ardentlivinglagos.com";
-// Send notification from the verified ardentlivinglagos.com domain so Resend
-// accepts sends to external recipients (onboarding@resend.dev is sandbox-only).
-const FROM_NOTIFICATION = "Ardent Inquiries <inquiries@ardentlivinglagos.com>";
-const FROM_CONFIRMATION = "Ardent Senior Living <hello@ardentlivinglagos.com>";
+// Use real verified mailboxes on the verified ardentlivinglagos.com domain.
+// Notification is sent from admin@ to info@ to avoid same-address loops; the
+// inquirer's confirmation comes from info@ so replies land in the main inbox.
+const FROM_NOTIFICATION = "Ardent Inquiries <admin@ardentlivinglagos.com>";
+const FROM_CONFIRMATION = "Ardent Senior Living <info@ardentlivinglagos.com>";
 
 function esc(s: string): string {
   return s
