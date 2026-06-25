@@ -1,7 +1,7 @@
 export function WhatsAppFloat() {
   return (
     <a
-      href="https://wa.me/+2348114018598?text=Hello%20Ardent%2C%20I%27d%20like%20to%20learn%20more%20about%20your%20services."
+      href="https://wa.me/2348114018598?text=Hello%20Ardent%2C%20I%27d%20like%20to%20learn%20more%20about%20your%20services."
       target="_blank"
       rel="noopener"
       aria-label="Chat with Ardent on WhatsApp"
