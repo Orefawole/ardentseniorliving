@@ -112,11 +112,11 @@ async function sendResend(
     html: string;
     reply_to?: string;
   },
-): Promise<void> {
+): Promise<{ ok: boolean; status?: number; body?: string; error?: string }> {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    console.warn(`[submitInquiry:${label}] RESEND_API_KEY not configured; skipping`);
-    return;
+    console.warn(`[submitInquiry:${label}] RESEND_API_KEY not configured`);
+    return { ok: false, error: "RESEND_API_KEY not configured" };
   }
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -130,13 +130,16 @@ async function sendResend(
     const body = await res.text().catch(() => "");
     if (!res.ok) {
       console.error(`[submitInquiry:${label}] Resend ${res.status}: ${body}`);
-    } else {
-      console.log(`[submitInquiry:${label}] sent to ${payload.to} → ${body}`);
+      return { ok: false, status: res.status, body };
     }
+    console.log(`[submitInquiry:${label}] sent to ${payload.to} → ${body}`);
+    return { ok: true, status: res.status, body };
   } catch (err) {
     console.error(`[submitInquiry:${label}] threw`, err);
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
+
 
 export const submitInquiry = createServerFn({ method: "POST" })
   .validator((input: unknown) => inquirySchema.parse(input))
