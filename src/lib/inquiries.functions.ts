@@ -99,29 +99,38 @@ function confirmationHtml(name: string): string {
   </div></body></html>`;
 }
 
-async function sendResend(payload: {
-  from: string;
-  to: string;
-  subject: string;
-  html: string;
-  reply_to?: string;
-}): Promise<void> {
+async function sendResend(
+  label: string,
+  payload: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    reply_to?: string;
+  },
+): Promise<void> {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    console.warn("[submitInquiry] RESEND_API_KEY not configured; skipping email send");
+    console.warn(`[submitInquiry:${label}] RESEND_API_KEY not configured; skipping`);
     return;
   }
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${key}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify(payload),
+    });
     const body = await res.text().catch(() => "");
-    console.error("[submitInquiry] Resend error", res.status, body);
+    if (!res.ok) {
+      console.error(`[submitInquiry:${label}] Resend ${res.status}: ${body}`);
+    } else {
+      console.log(`[submitInquiry:${label}] sent to ${payload.to} → ${body}`);
+    }
+  } catch (err) {
+    console.error(`[submitInquiry:${label}] threw`, err);
   }
 }
 
@@ -152,7 +161,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
 
     // Internal notification to Zoho inbox
     sends.push(
-      sendResend({
+      sendResend("notification", {
         from: FROM_NOTIFICATION,
         to: INTERNAL_RECIPIENT,
         subject: `New inquiry · ${data.inquiry_type || "General"} · ${data.name}`,
@@ -171,7 +180,7 @@ export const submitInquiry = createServerFn({ method: "POST" })
     // Confirmation to inquirer (only if they provided an email)
     if (data.email) {
       sends.push(
-        sendResend({
+        sendResend("confirmation", {
           from: FROM_CONFIRMATION,
           to: data.email,
           subject: "We've received your inquiry — Ardent Senior Living",
