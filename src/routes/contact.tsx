@@ -75,7 +75,7 @@ function ContactPage() {
               lines={[
                 <a
                   key="w"
-                  href="https://wa.me/2348114018598"
+                  href="https://web.whatsapp.com/send?phone=2348114018598"
                   target="_blank"
                   rel="noopener"
                   className="hover:text-brand-gold"
