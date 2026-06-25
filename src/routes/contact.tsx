@@ -75,7 +75,7 @@ function ContactPage() {
               lines={[
                 <a
                   key="w"
-                  href="https://web.whatsapp.com/send?phone=2348114018598"
+                  href="https://wa.me/2348114018598?text=Hello%20Ardent%2C%20I%27d%20like%20to%20learn%20more%20about%20your%20services."
                   target="_blank"
                   rel="noopener"
                   className="hover:text-brand-gold"
