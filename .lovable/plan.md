@@ -1,36 +1,63 @@
 ## Goal
 
-Make the inquiry form work on the live site without depending on the database. Each submission goes directly to `info@ardentlivinglagos.com` (and a confirmation to the inquirer) through Resend. The "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY" error disappears because no Supabase client is created at all.
+Deploy this site on Vercel with `vite build`, keep editing in Lovable, and have every Lovable edit auto-deploy to Vercel via GitHub — without touching `vite.config.ts`.
 
-## Why the live error happens
+## Most likely cause of the CSS failure on Vercel
 
-The current `submitInquiry` server function builds a Supabase client from `process.env.SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`. On the published Lovable deployment those server-side env vars aren't injected the way the dev sandbox provides them, so the client constructor throws the "Missing Supabase environment variable(s)" error before anything else runs — even though we're only inserting a row. Removing the Supabase call removes the failure mode entirely.
+Tailwind v4 compiles through **Lightning CSS**, which is a native binary (`lightningcss-linux-x64-gnu`) loaded as an **optional dependency**. Locally and on Lovable this is installed via `bun install` from `bun.lock`. On Vercel the default install runs `npm install`, which often skips that optional native binary on Linux — the build "succeeds" but Tailwind silently emits no styles, so the deployed site looks unstyled. This matches "the CSS itself" being the problem while Vercel doesn't actually fail.
+
+Fix: pin Vercel to **bun install** so it respects `bun.lock` and pulls the correct native CSS binary, and lock the build command/output explicitly so Vercel never second-guesses the TanStack output. No `vite.config.ts` changes.
 
 ## Changes
 
-**1. `src/lib/inquiries.functions.ts`** — strip out Supabase, keep Resend.
-- Remove the `createClient` import, the `supabasePublic` creation, and the `.from("inquiries").insert(...)` block.
-- Keep validation, both Resend sends (notification + confirmation), HTML templates, and the `Promise.allSettled` error handling.
-- If `RESEND_API_KEY` is missing OR the notification send fails, throw a user-facing error so the form shows a real failure instead of a silent success. The confirmation email staying best-effort is fine.
-- Log a stable request ID per submission to make Resend dashboard lookups easier.
+**1. New file `vercel.json`** (project root):
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "bun install",
+  "buildCommand": "vite build",
+  "framework": null
+}
+```
+- `installCommand: bun install` — installs Lightning CSS's Linux binary the same way Lovable does.
+- `buildCommand: vite build` — exactly what you asked for; the TanStack Vite plugin + Nitro `vercel` preset already emit `.vercel/output/` which Vercel auto-detects, so no Output Directory override is needed.
+- `framework: null` — stops Vercel from auto-detecting "Vite" and forcing `dist/` as the output dir (which would 404 the whole site).
 
-**2. No frontend changes.** `InquiryForm.tsx` already calls `submitInquiry` and handles success/error states correctly.
+**2. New file `.nvmrc`** with `20` — guarantees Vercel uses Node 20, matching the Lovable runtime. Avoids the second common silent-CSS failure (Node 18 + Lightning CSS).
 
-**3. Leave the `inquiries` table in place.** It's harmless, no longer written to, and removing it is a separate decision. (Mention to user; they can ask for a follow-up migration to drop it if they want.)
+**3. No code changes.** `vite.config.ts`, `src/styles.css`, routes, components, and the Resend inquiry flow are untouched.
 
-## What stays the same
+## Vercel project settings to set once (Project → Settings → General)
 
-- Sender: `Ardent Inquiries <admin@ardentlivinglagos.com>` → `info@ardentlivinglagos.com`, with `reply_to` set to the inquirer so Zoho replies go straight to them.
-- Confirmation: `info@ardentlivinglagos.com` → inquirer.
-- All copy, branding, and the WhatsApp / phone fallbacks in the templates.
+These are usually inherited from `vercel.json`, but set them explicitly so a future UI change can't override the file:
 
-## Verification after build mode
+- Framework Preset: **Other**
+- Build Command: **`vite build`** (Override ON)
+- Output Directory: **leave blank** (Override OFF — Nitro writes `.vercel/output/`)
+- Install Command: **`bun install`** (Override ON)
+- Node.js Version: **20.x**
 
-1. Submit a test inquiry on `/contact` with a real email.
-2. Confirm the notification lands in Zoho `info@` (check Spam once if first delivery).
-3. Confirm the confirmation arrives at the inquirer.
-4. Confirm the form no longer shows the Supabase env-var error.
+Also set the env vars on Vercel (Settings → Environment Variables, all three environments):
+- `RESEND_API_KEY` — required for the inquiry form to send mail.
+- Any `VITE_SUPABASE_*` keys you want available; the inquiry flow no longer needs them, but the Supabase client module reads them, so missing values can throw on first render. Copy them from the Lovable `.env`.
+
+## The ongoing workflow
+
+1. Connect the Lovable project to GitHub (Lovable → Plus menu → GitHub → Connect). One-time.
+2. In Vercel, **Import Project** from that GitHub repo. Confirm the settings above.
+3. From now on:
+   - Edit in Lovable as normal.
+   - Lovable pushes commits to GitHub automatically.
+   - Vercel sees the push and deploys with `bun install` + `vite build`.
+   - Custom domain stays pointed at Vercel; Lovable's `.lovable.app` URL continues to work for previewing in-progress changes.
+4. If you ever want to skip a Vercel deploy on a commit, prefix the commit message with `[skip ci]` (Lovable lets you edit commit messages from the version history side panel).
+
+## How to verify after the first Vercel deploy
+
+1. Open the Vercel deployment URL. Page should render with the Navy + Gold theme and Playfair / Inter fonts — not unstyled black-on-white text.
+2. In DevTools → Network, the `assets/*.css` file should be ~tens of KB (not a near-empty file).
+3. Submit a test inquiry on `/contact` and confirm it arrives in Zoho `info@ardentlivinglagos.com` — that proves `RESEND_API_KEY` got picked up by the serverless function.
 
 ## Trade-off to flag
 
-Without the DB row, submissions exist only as emails. If a Resend send ever fails silently or an email is deleted, there's no second copy. If you want a safety net later, the cleanest option is a tiny Resend-only audit log (e.g. append to a Google Sheet via a connector, or re-enable the DB insert once Cloud envs are sorted) — not required for this fix.
+`vercel.json` and `.nvmrc` will sync back into Lovable via GitHub. They're inert in the Lovable preview (Lovable uses its own runner) but make Vercel deterministic. If you ever switch hosts, deleting these two files is the only cleanup needed.
