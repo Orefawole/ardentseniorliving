@@ -144,6 +144,7 @@ async function sendResend(
 export const submitInquiry = createServerFn({ method: "POST" })
   .validator((input: unknown) => inquirySchema.parse(input))
   .handler(async ({ data }) => {
+    console.log("[submitInquiry] build=v2-resend-only (no supabase)");
     const requestId = `inq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     console.log(`[submitInquiry:${requestId}] received from ${data.name}`);
 
