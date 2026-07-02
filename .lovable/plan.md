@@ -1,24 +1,46 @@
-## Diagnosis
+## Goal
+Give visitors a clear picture of a typical day and week at Ardent without crowding the homepage. Add a dedicated **Activities** page and surface it from the main nav.
 
-The error text in the screenshot — `Missing Supabase environment variable(s): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY` — is thrown from exactly one file: `src/integrations/supabase/client.server.ts` (the admin client). The current `src/lib/inquiries.functions.ts` in the repo no longer imports Supabase at all — it already calls Resend directly via `fetch`. I verified by grepping the whole `src/` tree: nothing else imports `client.server` or references `SUPABASE_SERVICE_ROLE_KEY`.
+## New route: `/activities` (`src/routes/activities.tsx`)
 
-Conclusion: **the running live site is serving a stale bundle** built before the Supabase bypass landed. The code-side fix you asked for is already in place — it just hasn't been deployed.
+Reuses existing brand tokens (navy/gold/stone, Playfair + Inter, `SectionHeader`) so it matches the rest of the site. Sections top-to-bottom:
 
-(The Lovable preview proxies the dev server, which has the new code; the production URL on your custom domain is built and served by Vercel and is still running the old `inquiries.functions.ts` that called `supabaseAdmin`.)
+1. **Hero** — eyebrow "A Day at Ardent", H1 "Meaningful days, thoughtfully planned.", short intro.
+2. **Sample Daily Schedule** — the 13-row daily time structure (8:00 AM arrival → 7:00 PM pick-up) rendered as a clean two-column time/activity list (not a heavy table) so it reads well on mobile.
+3. **Sample Weekly Programme — Week 1** — full Mon–Fri Week 1 table with the "Culture & Community" theme. Responsive treatment:
+   - Desktop (md+): 6-column table (TIME + 5 days) with subtle gold header row, striped rows.
+   - Mobile: collapses to five stacked day cards (Monday…Friday), each listing the day's time-slot items. Uses the existing `Accordion` component so only one day is open at a time.
+   - Small legend note: "Italic entries are meal suggestions. Activities may be adjusted for individual client needs."
+   - "Download full 4-week schedule (PDF)" button — links to a static PDF placed at `public/ardent-4week-schedule.pdf` (generated once from the uploaded docx and committed as a static asset). Opens in a new tab.
+4. **Safety & Wellbeing** — three cards using the same visual language as the "Why Ardent" values grid on the home page:
+   - **Meal Philosophy** — soft textures, moderate salt/pepper, low oil, diabetic/hypertension-friendly adjustments per care plan.
+   - **Excursion Safety** — signed consent, 1:3 carer ratio at pool, medical clearance, shaded routes, water/Zobo provided.
+   - **Climate Considerations** — AC/fan-cooled indoor spaces, outdoor stretches before peak heat, hydration prompts, mandatory sun protection.
+5. **CTA strip** — navy band linking to `/contact` ("Book a Private Tour").
+6. **SEO head()** — unique title/description/og tags, canonical `/activities`, plus JSON-LD `Schedule`/`ItemList` describing the daily structure.
 
-## Plan
+## Navigation
 
-No code changes are needed to bypass Supabase — that's already done. To make the live site stop throwing the error:
+- Add "Activities" link to `src/components/site/Header.tsx` desktop + mobile nav, positioned between **Services** and **How It Works**.
+- Add "Activities" to the footer's site links in `src/components/site/Footer.tsx`.
+- Add `/activities` to `src/routes/sitemap[.]xml.ts`.
 
-1. **Trigger a fresh Vercel deploy** from the latest commit (push, or hit "Redeploy" in Vercel, with the "Use existing Build Cache" box **unchecked** so the stale server bundle is rebuilt).
-2. **Add a tiny build marker** to `src/lib/inquiries.functions.ts` (a one-line `console.log` at the top of the handler with a version string like `inquiry-fn v2-resend-only`). When you submit the form on the live site after redeploy, the server-function logs should show that line — that's how we confirm the new bundle is actually live. If we still see the old Supabase error after redeploy, the deployment didn't pick up the latest commit and we look at Vercel's build log / git source.
-3. **Confirm `RESEND_API_KEY` is set in Vercel's Environment Variables** for the Production environment (the local `.env` only covers Lovable's runtime — Vercel has its own env var store). Without it, the new code will return the "We couldn't submit your inquiry right now…" message instead.
+## Homepage nudge (minimal)
 
-No edits to `vite.config.ts`, no Supabase reconnect, no DB work.
+On `src/routes/index.tsx`, under the Services grid, add a single-line link "See a sample day and week →" pointing to `/activities`. No large new section on the homepage, per the brief.
 
-## What I will do in build mode
+## Downloadable PDF
 
-- Add the one-line version marker to `src/lib/inquiries.functions.ts`.
-- Tell you exactly where to set `RESEND_API_KEY` in Vercel and how to redeploy without build cache.
+- Generate `public/ardent-4week-schedule.pdf` once from the uploaded docx (LibreOffice convert), commit as a static asset served at `/ardent-4week-schedule.pdf`.
+- Referenced from the Weekly Programme section as an `<a href="/ardent-4week-schedule.pdf" download>` styled button.
 
-After you redeploy, submit the form once and I can read the server-function logs to confirm the new bundle is live.
+## Files touched
+
+- **New:** `src/routes/activities.tsx`, `public/ardent-4week-schedule.pdf`
+- **Edit:** `src/components/site/Header.tsx`, `src/components/site/Footer.tsx`, `src/routes/sitemap[.]xml.ts`, `src/routes/index.tsx` (one-line link only)
+- **Not touched:** `vite.config.ts` (per your instruction), server functions, inquiry form, backend, Resend integration.
+
+## Out of scope
+
+- No changes to the 4-week content itself — Week 1 is used verbatim from your document; Weeks 2–4 live only in the downloadable PDF.
+- No new backend, no CMS — content is static in the route file so future edits are one-file changes.
