@@ -62,7 +62,7 @@ const DAILY = [
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
 
-// Week 1 — Theme: "Culture & Community"
+// Week 1 — Theme: "Heritage & Wellness"
 // Rows: [time, mon, tue, wed, thu, fri]; meal rows flagged with isMeal for italic styling.
 type Row = {
   time: string;
@@ -297,7 +297,7 @@ function ActivitiesPage() {
             eyebrow="Sample Weekly Programme"
             title={
               <>
-                Week 1 — <span className="italic">Culture &amp; Community.</span>
+                Week 1 — <span className="italic">Heritage &amp; Wellness.</span>
               </>
             }
             align="center"
