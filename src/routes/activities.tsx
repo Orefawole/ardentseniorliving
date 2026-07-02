@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download } from "lucide-react";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import {
   Accordion,
