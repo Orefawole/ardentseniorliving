@@ -301,7 +301,7 @@ function ActivitiesPage() {
               </>
             }
             align="center"
-            intro="Below is a full sample week from our rotating four-week programme. Activities, meals and outings vary by week to keep each day fresh and engaging."
+            intro="Below is a full sample week from our programme. Activities, meals and outings vary by week to keep each day fresh and engaging."
           />
 
           {/* Desktop table */}
