@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download } from "lucide-react";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import {
   Accordion,
@@ -302,7 +301,7 @@ function ActivitiesPage() {
               </>
             }
             align="center"
-            intro="Below is a full sample week. Each of our four rotating weeks carries its own theme, meals and outings — download the complete four-week schedule for the full picture."
+            intro="Below is a full sample week from our rotating four-week programme. Activities, meals and outings vary by week to keep each day fresh and engaging."
           />
 
           {/* Desktop table */}
@@ -389,18 +388,6 @@ function ActivitiesPage() {
             Italic entries are meal suggestions. Activities may be adjusted for individual client
             needs.
           </p>
-
-          <div className="mt-10 text-center">
-            <a
-              href="/ardent-4week-schedule.pdf"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center gap-2 bg-brand-navy text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-brand-gold transition-colors"
-            >
-              <Download size={16} aria-hidden="true" />
-              Download full 4-week schedule (PDF)
-            </a>
-          </div>
         </div>
       </section>
 
